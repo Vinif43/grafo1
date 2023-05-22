@@ -1,0 +1,82 @@
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+public class Vertice {
+    private String nome;
+    private int grau;
+    private int grauIn;
+    private int grauOut;
+
+    public Vertice(String nome){
+        this.nome = nome;
+    }
+
+    public void addConexao(Vertice vertice) {
+        if(!vertificaConexao(vertice)) verticesAlcancaveis.add(vertice);
+    }
+
+    public String listaVerticesAlcancaveis( {
+        return verticesAlcancaveis.toString();
+    }
+
+    public boolean verificaConexao(Vertice vertice) {
+        return verticesAlcancaveis.contains(vertice);
+    }
+
+    public boolean verificaCaminho3niveis(Vertice vertice) { //quando o metodo repete sempre um codigo em hierarquia, muito provavel que precise de recursao
+        ArrayList<Vertice> caminho = new ArrayList<>();
+        caminho.add(this); //add a origem
+        boolean retorno = false;
+        if(verificaConexao(vertice)) { // verifica se existe conex direta
+            caminho.add(vertice);
+            retorno = true;
+        } else {
+            for(Vertice v : verticesAlcancaveis) { // verifica se existe conex indireta
+                if(v.verificaConexao(vertice)) {
+                    caminho.add(v);
+                    caminho.add(vertice);
+                    retorno = true;
+                }
+                else {
+                    for (Vertice v2 : v.verticesAlcancaveis) { // verifica se existe conex indireta
+                        if(v2.verificaConexao(vertice)) {
+                            caminho.add(v);
+                            caminho.add(v2);
+                            caminho.add(vertice);
+                            retorno = true;
+                        }
+                    }
+                }
+            }
+        }
+        if(retorno) System.out.println("caminho: " + caminho.toString());
+        return retorno;
+    }
+
+    public boolean verificaExisteCaminho(Vertice destino, List<Vertice> caminho) {
+
+        caminho.add(this);
+        System.out.println("Caminho temporário: " + caminho);
+        if(this.equals(destino)) {
+            System.out.println("caminho: " + caminho);
+            return true;
+        }
+        for(Vertice adjacente : this.verticesAlcancaveis) {
+            if(!caminho.contains(adjacente) && adjacente.verificaExisteCaminho(destino, caminho)) {
+                return true;
+            }
+        }
+        caminho.remove(caminho.size() - 1);
+        return false;
+    }
+
+    public String toString(){
+        return nome + " (grau: " + grau + ")";
+    }
+
+}
